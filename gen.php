@@ -10,7 +10,7 @@ $idParceiro = filter_input(INPUT_POST, 'id_parceiro');
 $descType = filter_input(INPUT_POST, 'desc_type');
 
 if( ! $idParceiro ){
-    require_once 'nav/form.html';
+    require_once 'nav/form.php';
     exit;
 }
 
