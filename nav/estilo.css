@@ -1,3 +1,5 @@
+@import url("//tmwxd.com.br/fontes/tmw-icons.css");
+
 * {
     margin: 0;
     padding: 0;
@@ -6,7 +8,7 @@
 
 #formB2W {
     display: block;
-    max-width: 500px;
+    max-width: 446px;
     margin: 20px;
     padding: 20px;
     background-color: #f8f8f8;
@@ -28,8 +30,13 @@
     margin-right: 10px;
 }
 
+#formB2W .campo:last-child {
+    margin-right: 0;
+}
+
 #formB2W .title {
     display: block;
+    height: 14px;
     margin-bottom: 5px;
 }
 
@@ -39,4 +46,40 @@
     color: #555;
     font-size: 12px;
     border: 1px solid #ddd;
+}
+
+#formB2W .text:focus, #formB2W .desc:focus {
+    border-color: #ccc;
+}
+
+#formB2W .btn {
+    background: rgba(255,255,255,1);
+    background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(255,255,255,1)), color-stop(47%, rgba(246,246,246,1)), color-stop(100%, rgba(237,237,237,1)));
+    background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%);
+    background: -o-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%);
+    background: -ms-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%);
+    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed', GradientType=0 );
+    cursor: pointer;
+}
+
+#formB2W .btn:hover {
+    background: rgba(237,237,237,1);
+    background: -moz-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 47%, rgba(255,255,255,1) 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(237,237,237,1)), color-stop(47%, rgba(246,246,246,1)), color-stop(100%, rgba(255,255,255,1)));
+    background: -webkit-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 47%, rgba(255,255,255,1) 100%);
+    background: -o-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 47%, rgba(255,255,255,1) 100%);
+    background: -ms-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 47%, rgba(255,255,255,1) 100%);
+    background: linear-gradient(to bottom, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 47%, rgba(255,255,255,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#ffffff', GradientType=0 );
+}
+
+#formB2W .btn::before {
+    content:'\f063';
+    padding-right:5px;
+    font: 14px TMWIcons;
+    color: #8a8a8a;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
 }
