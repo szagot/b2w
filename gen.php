@@ -14,7 +14,7 @@ $pathConf = __DIR__ . DIRECTORY_SEPARATOR . 'b2w.conf';
 $pdo = new Conecta();
 
 // ID Parceiro não informado?
-if (! $idParceiro) {
+if (! $idParceiro || empty($idParceiro)) {
     header('Content-type: text/html; charset=utf-8');
 
     // Verificando arquivo de pesquisa
@@ -41,11 +41,13 @@ if (! $idParceiro) {
     exit;
 }
 
-// Gravando Valores escolhidos
+// Gravando Valores escolhidos por padrão
 file_put_contents($pathConf, json_encode([
     'idParceiro' => $idParceiro,
     'descType'   => $descType
 ]));
 
-
 // Gerando pesquisa
+$produtos = $pdo->execute("
+    
+");
