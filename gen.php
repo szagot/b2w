@@ -47,7 +47,31 @@ file_put_contents($pathConf, json_encode([
     'descType'   => $descType
 ]));
 
+// Diferentes descrições
+$desCurta = 'IF( PRO_DESC_CURTA IS NULL, PRO_NOME, PRO_DESC_CURTA )';
+$desDefault = "IF( PRO_DESCRICAO IS NULL, $desCurta, PRO_DESCRICAO )";
+$desPadrao = "(SELECT DES_CONT FROM descricao_prod WHERE descricao_prod.PRO_ID = produto.PRO_ID AND DES_NOME = '$descType' ORDER BY DES_ORDEM LIMIT 0,1)";
+
+// Qual deve ser?
+if ($descType == 'curta') {
+    $getDesc = $desCurta;
+} elseif ($descType == 'default') {
+    $getDesc = $desDefault;
+} else {
+    $getDesc = "IF( $desPadrao IS NULL, $desDefault, $desPadrao )";
+}
+
 // Gerando pesquisa
 $produtos = $pdo->execute("
+    SELECT 
+      '$idParceiro' AS ID_PARCEIRO,
+      PRO_REF AS ID_ITEM_PARCEIRO,
+      PRO_NOME AS NOME_ITEM,
+      PRO_PESO AS PESO_UNITARIO,
+      $getDesc AS DESCRICAO_ITEM
+    FROM produto
     
+    LIMIT 0,2
 ");
+
+die(json_encode($produtos));
