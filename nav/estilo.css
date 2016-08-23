@@ -2,3 +2,13 @@
     margin: 0;
     padding: 0;
 }
+
+#formB2W {
+    display: block;
+    max-width: 500px;
+    padding: 20px;
+    border: 1px solid #eaeaea;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
