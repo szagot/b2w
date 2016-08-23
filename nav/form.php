@@ -13,8 +13,8 @@ if (! isset($descTypes)) {
     <body>
         <form id="formB2W" action="" method="post">
             <div class="campo">
-                <label class="title" for="id_parceiero">ID Parceiro</label>
-                <input class="text" type="text" name="id_parceiro" id="id_parceiero" value="<?= $idParceiro ?>">
+                <label class="title" for="id_parceiro">ID Parceiro</label>
+                <input class="text" type="text" name="id_parceiro" id="id_parceiro" value="<?= $idParceiro ?>">
             </div>
             <div class="campo">
                 <label class="title" for="desc_type">Descrição</label>
@@ -31,6 +31,7 @@ if (! isset($descTypes)) {
                 </select>
             </div>
             <div class="campo">
+                <label class="title"></label>
                 <button class="btn" type="submit">Gerar</button>
             </div>
         </form>
