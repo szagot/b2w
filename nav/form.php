@@ -8,7 +8,7 @@ if (! isset($descTypes)) {
     <head>
         <meta charset="UTF-8">
         <title>Gerador de Planilha da B2W</title>
-        <link href="estilo.css" rel="stylesheet" type="text/css">
+        <link href="nav/estilo.css" rel="stylesheet" type="text/css">
     </head>
     <body>
         <form id="formB2W" action="" method="post">
