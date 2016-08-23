@@ -6,15 +6,20 @@
         <link href="estilo.css" rel="stylesheet" type="text/css">
     </head>
     <body>
-        <!--
-            Colocar Form com os seguintes campos
-            input
-                name: id_parceiro
-                type: text
-
-            select
-                name: desc_type
-                values: [curta|Curta, default|Padrão, cnova|CNova]
-        -->
+    <form id="formB2W" action="" method="post">
+        <input class="text" type="text" name="id_parceiro" id="id_parceiero">
+        <select class="desc" name="desc_type" id="desc_type">
+            <option value="curta">Descrição Curta</option>
+            <option value="default" selected>Descrição Padrão</option>
+            <?php
+                foreach( $descTypes as $descType ){
+                    ?>
+                    <option><?= $descType ?></option>
+                    <?php
+                }
+            ?>
+        </select>
+        <button class="btn" type="submit">Gerar</button>
+    </form>
     </body>
 </html>
