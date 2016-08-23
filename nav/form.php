@@ -12,14 +12,14 @@ if (! isset($descTypes)) {
     </head>
     <body>
         <form id="formB2W" action="" method="post">
-            <input class="text" type="text" name="id_parceiro" id="id_parceiero">
+            <input class="text" type="text" name="id_parceiro" id="id_parceiero" value="<?= $idParceiro ?>">
             <select class="desc" name="desc_type" id="desc_type">
-                <option value="curta">Descrição Curta</option>
-                <option value="default" selected>Descrição Padrão</option>
+                <option value="curta" <?= ($descType == 'curta') ? 'selected' : '' ?>>Descrição Curta</option>
+                <option value="default" <?= ($descType == 'default' || empty($descType)) ? 'selected' : '' ?>>Descrição Padrão</option>
                 <?php
-                foreach ($descTypes as $descType) {
+                foreach ($descTypes as $desc) {
                     ?>
-                    <option><?= $descType ?></option>
+                    <option <?= ($descType == $desc) ? 'selected' : '' ?>><?= $desc ?></option>
                     <?php
                 }
                 ?>
