@@ -20,7 +20,9 @@ if (! isset($descTypes)) {
                 <label class="title" for="desc_type">Descrição</label>
                 <select class="desc" name="desc_type" id="desc_type">
                     <option value="curta" <?= ($descType == 'curta') ? 'selected' : '' ?>>Descrição Curta</option>
-                    <option value="default" <?= ($descType == 'default' || empty($descType)) ? 'selected' : '' ?>>Descrição Padrão</option>
+                    <option value="default" <?= ($descType == 'default' || empty($descType)) ? 'selected' : '' ?>>
+                        Descrição Padrão
+                    </option>
                     <?php
                     foreach ($descTypes as $desc) {
                         ?>
@@ -35,5 +37,18 @@ if (! isset($descTypes)) {
                 <button class="btn" type="submit">Gerar</button>
             </div>
         </form>
+
+        <div id="empty" class="modal-box">
+            <div class="modal-content">
+                <p>
+                    <b>Nenhum registro encontrado.</b>
+                </p>
+                <p>
+                    Verifique se os produtos possuem imagem e se todas as seções têm
+                    as categorias da B2W.
+                </p>
+                <a href="#close" class="close-link">X</a>
+            </div>
+        </div>
     </body>
 </html>

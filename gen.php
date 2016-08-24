@@ -5,11 +5,14 @@
  * Date: 23/08/2016
  * Time: 15:05
  */
+//error_reporting( E_ALL );
+
 require_once '../config/conecta.class.php';
 
 // Inicializa variáveis
 $idParceiro = filter_input(INPUT_POST, 'id_parceiro');
 $descType = filter_input(INPUT_POST, 'desc_type');
+$erro = filter_input(INPUT_GET, 'msg');
 $pathConf = __DIR__ . DIRECTORY_SEPARATOR . 'b2w.conf';
 $pdo = new Conecta();
 
@@ -41,11 +44,6 @@ if (! $idParceiro || empty($idParceiro)) {
     exit;
 }
 
-header('Content-type: text/csv; charset=utf-8');
-//header('Content-Disposition: attachment; filename=b2w-' . date('Y-m-d-H-i') . '.csv');
-//header('Pragma: no-cache');
-//header('Expires: 0');
-
 // Gravando Valores escolhidos por padrão
 file_put_contents($pathConf, json_encode([
     'idParceiro' => $idParceiro,
@@ -74,39 +72,109 @@ $ePromo = 'PRO_PROMOCAO > 0 AND
 // Gerando pesquisa
 $produtos = $pdo->execute("
     SELECT 
-      '$idParceiro' AS ID_PARCEIRO,
-      PRO_REF AS ID_ITEM_PARCEIRO,
-      PRO_NOME AS NOME_ITEM,
-      PRO_PESO AS PESO_UNITARIO,
-      $getDesc AS DESCRICAO_ITEM,
-      '' AS IMAGEM_ITEM,
-      PRO_LARGURA AS LARGURA,
-      PRO_COMPRIMENTO AS COMPRIMENTO,
-      PRO_GTIN AS EAN,
-      '' AS ID_ITEM_PAI,
-      '' AS NOME_ITEM_PAI,
-      'E' AS TIPO_ITEM,
-      IF( PRO_ATIVO = 1 AND PRO_ESTOQUE > 0 AND PRO_VISIBILIDADE NOT LIKE '%loja%', 'A', 'I' ) AS SITUACAO_ITEM,
-      PRO_DIAS_PRAZO AS PRAZO_XD,
-      IF( $ePromo, PRO_VALOR, '' ) AS PRECO_DE,
-      IF( $ePromo, PRO_PROMOCAO, PRO_VALOR ) AS PRECO_POR,
-      PRO_ESTOQUE AS QTDE_ESTOQUE,
-      '' AS DEPARTAMENTO,
-      '' AS SETOR,
-      '' AS FAMILIA,
-      '' AS SUB_FAMILIA,
-      SEC_URL AS TEMP,
-      IF( PRO_SOB_ENCOMENDA = 1, '1', '0' ) AS PROCEDENCIA_ITEM,
-      FOR_NOME AS MARCA
+        '$idParceiro' AS ID_PARCEIRO,
+        PRO_REF AS ID_ITEM_PARCEIRO,
+        PRO_NOME AS NOME_ITEM,
+        ROUND(PRO_PESO,0) AS PESO_UNITARIO,
+        $getDesc AS DESCRICAO_ITEM,
+        '' AS IMAGEM_ITEM,
+        ROUND(PRO_ALTURA * 1000, 0) AS ALTURA,
+        ROUND(PRO_LARGURA * 1000, 0) AS LARGURA,
+        ROUND(PRO_COMPRIMENTO * 1000, 0) AS COMPRIMENTO,
+        PRO_GTIN AS EAN,
+        '' AS ID_ITEM_PAI,
+        '' AS NOME_ITEM_PAI,
+        'E' AS TIPO_ITEM,
+        IF( PRO_ATIVO = 1 AND PRO_ESTOQUE > 0 AND PRO_VISIBILIDADE NOT LIKE '%loja%', 'A', 'I' ) AS SITUACAO_ITEM,
+        PRO_DIAS_PRAZO AS PRAZO_XD,
+        IF( $ePromo, ROUND(PRO_VALOR,2), '' ) AS PRECO_DE,
+        ROUND(IF( $ePromo, PRO_PROMOCAO, PRO_VALOR ),2) AS PRECO_POR,
+        PRO_ESTOQUE AS QTDE_ESTOQUE,
+        '' AS DEPARTAMENTO,
+        '' AS SETOR,
+        '' AS FAMILIA,
+        '' AS SUB_FAMILIA,
+        IF( PRO_SOB_ENCOMENDA = 1, '1', '0' ) AS PROCEDENCIA_ITEM,
+        FOR_NOME AS MARCA,
+        produto.PRO_ID AS TEMP_ID,
+        SEC_URL AS TEMP_SEC
 
     FROM produto
-    LEFT JOIN fornecedor ON produto.FOR_ID = fornecedor.FOR_ID
-    INNER JOIN secao_prod ON produto.SEC_ID = secao_prod.SEC_ID
+        LEFT JOIN fornecedor ON produto.FOR_ID = fornecedor.FOR_ID
+        INNER JOIN secao_prod ON produto.SEC_ID = secao_prod.SEC_ID
     
     WHERE
-      SUB_PRO_ID IS NULL 
+      SUB_PRO_ID IS NULL AND PRO_VALOR > 0
 ");
 
 // Tratando os dados
+$saida = '';
+foreach ($produtos as $produto) {
+    // Verificando seções
+    $produto->TEMP_SEC = str_replace(' ', '', $produto->TEMP_SEC);
+    if (! preg_match('/^[0-9]+\|[a-z]+/i', $produto->TEMP_SEC)) {
+        continue;
+    }
 
-//die(json_encode($produtos));
+    // Pegando Imagens
+    $imagens = $pdo->execute("
+      SELECT 
+        CONCAT((SELECT CON_HEADER_URL FROM config LIMIT 0,1),'img/produtos/',IMG_NOME) AS img 
+      
+      FROM img_prod 
+      
+      WHERE PRO_ID = '{$produto->TEMP_ID}' AND IMG_TIPO = 1 ORDER BY IMG_ORDEM
+    ");
+
+    if (! isset($imagens[ 0 ]->img)) {
+        continue;
+    }
+
+    // Salvando imagens
+    $produto->IMAGEM_ITEM = implode(',', array_values($imagens));
+
+    // Formatando Seçoes
+    list($depto, $setor, $familia, $subFamilia) = explode('>', $produto->TEMP_SEC);
+    list($produto->DEPARTAMENTO) = explode('|', $depto);
+    list($produto->SETOR) = explode('|', $setor);
+    list($produto->FAMILIA) = explode('|', $familia);
+    list($produto->SUB_FAMILIA) = explode('|', $subFamilia);
+
+    // Apagando chaves temporárias
+    unset($produto->TEMP_ID, $produto->TEMP_SEC);
+
+    // Corrigindo descrição
+    $produto->DESCRICAO_ITEM =
+        // Remove ;
+        str_replace(';', ',',
+            // Remove espaços extras
+            preg_replace('[\n\r\s\t]+', ' ',
+                // Limpa tags HTML
+                strip_tags($produto->DESCRICAO_ITEM)
+            )
+        );
+
+    // Montando Saída
+    if (empty($saida)) {
+        $saida = implode(';', array_keys($produto)) . PHP_EOL;
+    }
+
+    $saida .= implode(';', array_values($produto)) . PHP_EOL;
+
+}
+
+// Remove quebra de linha final
+$saida = substr($saida, 0, -1);
+
+if(! empty($saida)) {
+    // Cabeçalhos
+    header('Content-type: text/csv; charset=utf-8');
+    //header('Content-Disposition: attachment; filename=b2w-' . date('Y-m-d-H-i') . '.csv');
+    //header('Cache-Control: no-cache, no-store, must-revalidate'); # HTTP 1.1
+    //header('Pragma: no-cache'); # HTTP 1.0
+    //header('Expires: 0'); # Proxies
+
+    die( $saida );
+}
+
+header('Location: ./gen.php#empty');
