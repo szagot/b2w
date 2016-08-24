@@ -41,6 +41,11 @@ if (! $idParceiro || empty($idParceiro)) {
     exit;
 }
 
+header('Content-type: text/csv; charset=utf-8');
+//header('Content-Disposition: attachment; filename=b2w-' . date('Y-m-d-H-i') . '.csv');
+//header('Pragma: no-cache');
+//header('Expires: 0');
+
 // Gravando Valores escolhidos por padrão
 file_put_contents($pathConf, json_encode([
     'idParceiro' => $idParceiro,
@@ -81,7 +86,7 @@ $produtos = $pdo->execute("
       '' AS ID_ITEM_PAI,
       '' AS NOME_ITEM_PAI,
       'E' AS TIPO_ITEM,
-      IF( PRO_ATIVO = 1, 'A', 'I' ) AS SITUACAO_ITEM,
+      IF( PRO_ATIVO = 1 AND PRO_ESTOQUE > 0 AND PRO_VISIBILIDADE NOT LIKE '%loja%', 'A', 'I' ) AS SITUACAO_ITEM,
       PRO_DIAS_PRAZO AS PRAZO_XD,
       IF( $ePromo, PRO_VALOR, '' ) AS PRECO_DE,
       IF( $ePromo, PRO_PROMOCAO, PRO_VALOR ) AS PRECO_POR,
@@ -95,11 +100,13 @@ $produtos = $pdo->execute("
       FOR_NOME AS MARCA
 
     FROM produto
-    
     LEFT JOIN fornecedor ON produto.FOR_ID = fornecedor.FOR_ID
     INNER JOIN secao_prod ON produto.SEC_ID = secao_prod.SEC_ID
     
-    LIMIT 0,2
+    WHERE
+      SUB_PRO_ID IS NULL 
 ");
 
-die(json_encode($produtos));
+// Tratando os dados
+
+//die(json_encode($produtos));
