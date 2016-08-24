@@ -131,7 +131,12 @@ foreach ($produtos as $produto) {
     }
 
     // Salvando imagens
-    $produto->IMAGEM_ITEM = implode(',', array_values($imagens));
+    $imgTemp = [];
+    foreach ($imagens as $img) {
+        $imgTemp[] = $img->img;
+    }
+
+    $produto->IMAGEM_ITEM = implode(',', $imgTemp);
 
     // Formatando Seçoes
     list($depto, $setor, $familia, $subFamilia) = explode('>', $produto->TEMP_SEC);
@@ -146,35 +151,51 @@ foreach ($produtos as $produto) {
     // Corrigindo descrição
     $produto->DESCRICAO_ITEM =
         // Remove ;
-        str_replace(';', ',',
+        trim(str_replace(';', ',',
             // Remove espaços extras
-            preg_replace('[\n\r\s\t]+', ' ',
+            preg_replace('/[\n\r\s\t]+/i', ' ',
                 // Limpa tags HTML
                 strip_tags($produto->DESCRICAO_ITEM)
             )
-        );
+        ));
 
     // Montando Saída
+    // Titulos
     if (empty($saida)) {
-        $saida = implode(';', array_keys($produto)) . PHP_EOL;
+        foreach ($produto as $chave => $valor) {
+            $saida .= $chave . ';';
+        }
+
+        $saida = substr($saida, 0, -1) . PHP_EOL;
     }
 
-    $saida .= implode(';', array_values($produto)) . PHP_EOL;
+    // Valores
+    foreach ($produto as $valor) {
+        $saida .= $valor . ';';
+    }
+
+    $saida = substr($saida, 0, -1) . PHP_EOL;
 
 }
 
 // Remove quebra de linha final
 $saida = substr($saida, 0, -1);
 
-if(! empty($saida)) {
+if (! empty($saida)) {
     // Cabeçalhos
     header('Content-type: text/csv; charset=utf-8');
-    //header('Content-Disposition: attachment; filename=b2w-' . date('Y-m-d-H-i') . '.csv');
-    //header('Cache-Control: no-cache, no-store, must-revalidate'); # HTTP 1.1
-    //header('Pragma: no-cache'); # HTTP 1.0
-    //header('Expires: 0'); # Proxies
+    header('Content-Disposition: attachment; filename=b2w-' . date('Y-m-d-H-i') . '.csv');
+    header('Cache-Control: no-cache, no-store, must-revalidate'); # HTTP 1.1
+    header('Pragma: no-cache'); # HTTP 1.0
+    header('Expires: 0'); # Proxies
 
-    die( $saida );
+    die('teste' . $saida);
 }
 
-header('Location: ./gen.php#empty');
+// Se não houveram dados a serem mostrados, retorna ao inicio.
+if (! headers_sent()) {
+    header('Location: ./gen.php#empty');
+    exit;
+}
+
+echo 'Nenhum registro encontrado';
