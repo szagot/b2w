@@ -5,7 +5,6 @@
  * Date: 23/08/2016
  * Time: 15:05
  */
-//error_reporting( E_ALL );
 
 require_once '../config/conecta.class.php';
 
@@ -189,7 +188,7 @@ if (! empty($saida)) {
     header('Pragma: no-cache'); # HTTP 1.0
     header('Expires: 0'); # Proxies
 
-    die('teste' . $saida);
+    die($saida);
 }
 
 // Se não houveram dados a serem mostrados, retorna ao inicio.
