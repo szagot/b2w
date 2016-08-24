@@ -61,6 +61,11 @@ if ($descType == 'curta') {
     $getDesc = "IF( $desPadrao IS NULL, $desDefault, $desPadrao )";
 }
 
+// Verifica Promo
+$ePromo = 'PRO_PROMOCAO > 0 AND 
+          ( DATE(PRO_PROMO_INI) <= DATE(NOW()) OR PRO_PROMO_INI = \'0000-00-00\' OR PRO_PROMO_INI IS NULL ) AND
+          ( DATE(PRO_PROMO_FIM) >= DATE(NOW()) OR PRO_PROMO_FIM = \'0000-00-00\' OR PRO_PROMO_FIM IS NULL )';
+
 // Gerando pesquisa
 $produtos = $pdo->execute("
     SELECT 
@@ -68,8 +73,31 @@ $produtos = $pdo->execute("
       PRO_REF AS ID_ITEM_PARCEIRO,
       PRO_NOME AS NOME_ITEM,
       PRO_PESO AS PESO_UNITARIO,
-      $getDesc AS DESCRICAO_ITEM
+      $getDesc AS DESCRICAO_ITEM,
+      '' AS IMAGEM_ITEM,
+      PRO_LARGURA AS LARGURA,
+      PRO_COMPRIMENTO AS COMPRIMENTO,
+      PRO_GTIN AS EAN,
+      '' AS ID_ITEM_PAI,
+      '' AS NOME_ITEM_PAI,
+      'E' AS TIPO_ITEM,
+      IF( PRO_ATIVO = 1, 'A', 'I' ) AS SITUACAO_ITEM,
+      PRO_DIAS_PRAZO AS PRAZO_XD,
+      IF( $ePromo, PRO_VALOR, '' ) AS PRECO_DE,
+      IF( $ePromo, PRO_PROMOCAO, PRO_VALOR ) AS PRECO_POR,
+      PRO_ESTOQUE AS QTDE_ESTOQUE,
+      '' AS DEPARTAMENTO,
+      '' AS SETOR,
+      '' AS FAMILIA,
+      '' AS SUB_FAMILIA,
+      SEC_URL AS TEMP,
+      IF( PRO_SOB_ENCOMENDA = 1, '1', '0' ) AS PROCEDENCIA_ITEM,
+      FOR_NOME AS MARCA
+
     FROM produto
+    
+    LEFT JOIN fornecedor ON produto.FOR_ID = fornecedor.FOR_ID
+    INNER JOIN secao_prod ON produto.SEC_ID = secao_prod.SEC_ID
     
     LIMIT 0,2
 ");
