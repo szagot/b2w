@@ -5,6 +5,16 @@
  * Date: 23/08/2016
  * Time: 15:05
  */
+if (! isset($_SESSION[ 'TMWXD' ])) {
+    @session_start();
+}
+
+date_default_timezone_set('America/Sao_Paulo');
+
+if ((time() - $_SESSION[ 'TMWXD' ][ 'acesso' ]) > $_SESSION[ 'TMWXD' ][ 'periodo' ]) {
+    // Deslogar ao final do período
+    die('Acesso negado.');
+}
 
 require_once '../config/conecta.class.php';
 
